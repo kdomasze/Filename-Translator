@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Web;
 
@@ -7,17 +9,40 @@ namespace FileNameTranslator
 {
     public class Program
     {
-        //private static HttpClient Client = new HttpClient();
-
         public static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.Unicode;
 
             // url vars
-            var sourceText = "こんにちは世界";
+            var sourceText = "";
             var sourceLang = "auto";
             var targetLang = "en";
-            
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "test");
+
+            if (!Directory.Exists(path)) return;
+
+            var fileDetailsList = new List<FileDetails>();
+
+            var files = Directory.GetFiles(path).ToList();
+
+            foreach(var file in files)
+            {
+                var fileDetails = new FileDetails()
+                {
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    Extension = Path.GetExtension(file)
+                };
+
+                fileDetailsList.Add(fileDetails);
+
+                sourceText += fileDetails.Name;
+                if(files.Last() != file)
+                {
+                    sourceText += "\n";
+                }
+            }
+
             // translate url
             var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl="
             + sourceLang + "&tl=" + targetLang + "&dt=t&q=" +  HttpUtility.UrlEncode(sourceText);
@@ -33,17 +58,54 @@ namespace FileNameTranslator
                 client.DownloadFile(uri, tmpFile);
             }
 
-            // output to console
+            // parse translation
             if(File.Exists(tmpFile))
             {
-                string result = File.ReadAllText(tmpFile);
-                Console.WriteLine(result);
+                var result = File.ReadAllText(tmpFile).Split('"');
+
+                var fileDetailsIndex = 0;
+                var index = 0;
+                var nextIndex = 1;
+
+                foreach(var item in result)
+                {
+                    if (index == nextIndex)
+                    {
+                        var translation = item;
+                        if (item.Contains("\\n"))
+                            translation = item.Substring(0, item.Length - 2);
+
+                        fileDetailsList[fileDetailsIndex].Translation = translation;
+
+                        if (fileDetailsIndex == fileDetailsList.Count - 1) break;
+                        nextIndex += 4;
+                        fileDetailsIndex++;
+                    }
+
+                    index++;
+                }
             }
             else
             {
                 Console.WriteLine("failed");
             }
+
+            // rename
+            foreach(var fileDetail in fileDetailsList)
+            {
+                var oldFileName = Path.Combine(path, fileDetail.Name + fileDetail.Extension);
+                var newFileName = Path.Combine(path, fileDetail.Translation + fileDetail.Extension);
+                File.Move(oldFileName, newFileName);
+            }
+
             Console.ReadKey();
         }
+    }
+
+    public class FileDetails
+    {
+        public string Name { get; set; }
+        public string Extension { get; set; }
+        public string Translation { get; set; }
     }
 }
