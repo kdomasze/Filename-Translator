@@ -9,14 +9,17 @@ namespace FileNameTranslator
 {
     public class Program
     {
+        #region Flags
         private static string _sourceLang = "auto";
         private static string _targetLang = "en";
         private static string _path = Directory.GetCurrentDirectory();
         private static bool _straightRename = false;
         private static bool _verbose = false;
+        #endregion
 
         public static void Main(string[] args)
         {
+            #region Initialize
             Console.OutputEncoding = System.Text.Encoding.Unicode;
 
             ParseArgs(args);
@@ -30,6 +33,7 @@ namespace FileNameTranslator
                 return;
             }
 
+            var tmpFile = Path.GetTempFileName();
             var fileDetailsList = new List<FileDetails>();
 
             var files = Directory.GetFiles(_path).ToList();
@@ -57,9 +61,9 @@ namespace FileNameTranslator
             + _sourceLang + "&tl=" + _targetLang + "&dt=t&q=" + HttpUtility.UrlEncode(sourceText);
 
             var uri = new Uri(url);
+            #endregion
 
-            // download translation to tmp file
-            var tmpFile = Path.GetTempFileName();
+            #region Download translation
             Log("Getting translation for file names.");
             using (WebClient client = new WebClient())
             {
@@ -67,8 +71,9 @@ namespace FileNameTranslator
                                               "(KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
                 client.DownloadFile(uri, tmpFile);
             }
+            #endregion
 
-            // parse translation
+            #region  Parse translation
             if (File.Exists(tmpFile))
             {
                 Log("Parsing translation.");
@@ -78,6 +83,7 @@ namespace FileNameTranslator
                 var index = 0;
                 var nextIndex = 1;
 
+                // The sections of interest will be on every 4th line after starting from line 2.
                 foreach (var item in result)
                 {
                     if (index == nextIndex)
@@ -101,8 +107,9 @@ namespace FileNameTranslator
                 Console.WriteLine("Translation failed. Exiting.");
                 return;
             }
+            #endregion
 
-            // rename
+            #region Rename
             foreach (var fileDetail in fileDetailsList)
             {
                 var oldFileName = Path.Combine(_path, fileDetail.Name + fileDetail.Extension);
@@ -116,18 +123,23 @@ namespace FileNameTranslator
                 {
                     newFileName = Path.Combine(_path, fileDetail.Translation + " (" + fileDetail.Name + ")" + fileDetail.Extension);
                 }
+
                 Log("Renaming file \"" + oldFileName + "\" to \"" + newFileName + "\"");
                 File.Move(oldFileName, newFileName);
             }
+            #endregion
 
             Console.WriteLine("Translation complete.");
         }
 
+        /// <summary>
+        /// Prints message to the console if user specifies the verbose flag.
+        /// </summary>
+        /// <param name="message">String to print</param>
         private static void Log(string message)
         {
             if (_verbose) Console.WriteLine("Opening path: " + message);
         }
-
 
         /// <summary>
         /// Parses the commandline arguments.
