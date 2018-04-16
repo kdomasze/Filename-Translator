@@ -138,7 +138,7 @@ namespace FileNameTranslator
         /// <param name="message">String to print</param>
         private static void Log(string message)
         {
-            if (_verbose) Console.WriteLine("Opening path: " + message);
+            if (_verbose) Console.WriteLine(message);
         }
 
         /// <summary>
@@ -172,6 +172,7 @@ namespace FileNameTranslator
                     case "--help":
                     case "-h":
                         PrintHelp();
+                        Environment.Exit(0);
                         return;
                     default:
                         break;
@@ -189,11 +190,11 @@ namespace FileNameTranslator
             Console.WriteLine("       fnt [PATH] [OPTION]...");
             Console.WriteLine("If no path is specified, the current working directory will be the root of renaming.");
             Console.WriteLine("Options:");
-            Console.WriteLine("\t-sl, --sourcelang [lang]\t\tspecifies the source language of the file names (default: auto).");
-            Console.WriteLine("\t-tl, --targetlang [lang]\t\tspecifies the output language of the file names (default: en).");
-            Console.WriteLine("\t-sr, --straightRename\t\t specifies whether to rename the files directly or keep the original name in the new name (default: [translation] ([original name]).[ext]).");
-            Console.WriteLine("\t-v, --verbose\t\tprints extra details about the process during the scripts execution.");
-            Console.WriteLine("\t-h, --help\t\tdisplays this help page.");
+            Console.WriteLine("\t-sl, --sourcelang [lang]\tspecifies the source language of the file names (default: auto).");
+            Console.WriteLine("\t-tl, --targetlang [lang]\tspecifies the output language of the file names (default: en).");
+            Console.WriteLine("\t-sr, --straightRename\t\tspecifies whether to rename the files directly or keep the original\n\t\t\t\t\t\tname in the new name (default: [translation] ([original name]).[ext]).");
+            Console.WriteLine("\t-v, --verbose\t\t\tprints extra details about the process during the scripts execution.");
+            Console.WriteLine("\t-h, --help\t\t\tdisplays this help page.");
         }
     }
 
