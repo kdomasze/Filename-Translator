@@ -38,6 +38,12 @@ namespace FileNameTranslator
 
             var files = Directory.GetFiles(_path).ToList();
 
+            if(files.Count == 0)
+            {
+                Log("No files exist. Exiting.");
+                return;
+            }
+
             foreach (var file in files)
             {
                 Log("Parsing file: " + file);
