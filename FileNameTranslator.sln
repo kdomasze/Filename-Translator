@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FnTranslator", "FnTranslator\FnTranslator.csproj", "{911C5CD9-415B-4B2D-8850-E967C30EFEDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileNameTranslator", "FileNameTranslator\FileNameTranslator.csproj", "{911C5CD9-415B-4B2D-8850-E967C30EFEDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
