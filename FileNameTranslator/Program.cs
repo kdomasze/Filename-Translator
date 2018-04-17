@@ -120,6 +120,17 @@ namespace FileNameTranslator
             {
                 var oldFileName = Path.Combine(_path, fileDetail.Name + fileDetail.Extension);
                 var newFileName = "";
+                
+                // replaces illegal filename characters with alternatives
+                fileDetail.Translation = fileDetail.Translation.Replace('/', '-');
+                fileDetail.Translation = fileDetail.Translation.Replace('\\', '-');
+                fileDetail.Translation = fileDetail.Translation.Replace('|', '-');
+                fileDetail.Translation = fileDetail.Translation.Replace('<', '(');
+                fileDetail.Translation = fileDetail.Translation.Replace('>', ')');
+                fileDetail.Translation = fileDetail.Translation.Replace(':', '-');
+                fileDetail.Translation = fileDetail.Translation.Replace('\"', '\'');
+                fileDetail.Translation = fileDetail.Translation.Replace("?", "");
+                fileDetail.Translation = fileDetail.Translation.Replace("*", "");
 
                 if (_straightRename)
                 {
